@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Event Registration</title>
+</head>
+<body>
+  <h2>Available Events</h2>
+  <ul id="eventList"></ul>
+
+  <h2>Register for an Event</h2>
+  <input type="text" id="userID" placeholder="Enter Your User ID">
+  <button onclick="registerForEvent()">Register</button>
+
+  <script>
+    async function loadEvents() {
+      const response = await fetch("http://your-ec2-ip:3000/events");
+      const events = await response.json();
+      let eventList = document.getElementById("eventList");
+      eventList.innerHTML = events.map(event => 
+        `<li>${event.EventName} - ${event.Date} - ${event.Location} 
+        <button onclick="register('${event.EventID}')">Register</button></li>`
+      ).join("");
+    }
+
+    async function register(eventID) {
+      const userID = document.getElementById("userID").value;
+      await fetch("http://your-ec2-ip:3000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ EventID: eventID, UserID: userID, UserName: "John Doe" })
+      });
+      alert("Registered successfully!");
+    }
+
+    loadEvents();
+  </script>
+</body>
+</html>
