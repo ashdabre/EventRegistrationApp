@@ -5,61 +5,38 @@
 </head>
 <body>
   <h2>Available Events</h2>
-  <ul id="eventList">Loading events...</ul>
-  
+  <ul id="eventList"></ul>
+
   <h2>Register for an Event</h2>
   <input type="text" id="userID" placeholder="Enter Your User ID">
   <button onclick="registerForEvent()">Register</button>
-  
+
   <script>
-    // Function to load events from backend
     async function loadEvents() {
-      try {
-        const response = await fetch("http://44.201.165.153:3000/events");
-        const events = await response.json();
-        const eventList = document.getElementById("eventList");
-        if (events.length === 0) {
-          eventList.innerHTML = "<li>No events available. Please add some events.</li>";
-        } else {
-          eventList.innerHTML = events.map(event =>
-            `<li>${event.EventName} - ${event.Date} - ${event.Location} 
-            <button onclick="register('${event.EventID}')">Register</button></li>`
-          ).join("");
-        }
-      } catch (error) {
-        console.error("Error loading events:", error);
-        document.getElementById("eventList").innerHTML = "<li>Error loading events.</li>";
-      }
+      const response = await fetch("http://44.201.165.153:3000/events");
+      const events = await response.json();
+      let eventList = document.getElementById("eventList");
+      eventList.innerHTML = events.map(event => 
+        `<li>${event.EventName} - ${event.Date} - ${event.Location} 
+        <button onclick="register('${event.EventID}')">Register</button></li>`
+      ).join("");
     }
-    
-    // Function to register for an event
+
     async function register(eventID) {
       const userID = document.getElementById("userID").value;
       if (!userID) {
         alert("Please enter a User ID before registering!");
         return;
       }
-      try {
-        const response = await fetch("http://44.201.165.153:3000/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ EventID: eventID, UserID: userID, UserName: "John Doe" })
-        });
-        const result = await response.json();
-        alert(result.message || "Registered successfully!");
-      } catch (error) {
-        console.error("Registration error:", error);
-        alert("Registration failed.");
-      }
+      const response = await fetch("http://44.201.165.153:3000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ EventID: eventID, UserID: userID, UserName: "John Doe" })
+      });
+      const result = await response.json();
+      alert(result.message || "Registered successfully!");
     }
-    
-    // Function triggered by the "Register" button (if you want a separate function)
-    function registerForEvent() {
-      // This function could open a modal or trigger some other registration flow
-      alert("Please click the 'Register' button next to the event you want to join.");
-    }
-    
-    // Load events on page load
+
     loadEvents();
   </script>
 </body>
